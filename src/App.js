@@ -3,8 +3,13 @@ import { UploadInput, Chart } from "./component/index.js";
 import { useGlobalContext } from "./context/context.js";
 
 function App() {
-  const { sheetNames, targetSheetData, handleExcel, changeTargetSheet } =
-    useGlobalContext();
+  const {
+    sheetNames,
+    targetSheetData,
+    handleExcel,
+    changeTargetSheet,
+    handleSort,
+  } = useGlobalContext();
   const [sheetHeads, setSheetHeads] = useState([]);
   useEffect(() => {
     if (targetSheetData) {
@@ -45,21 +50,26 @@ function App() {
             </div>
             {targetSheetData && (
               <div className="container fluid overflow-auto border p-2 text-center">
-                <table className="table">
+                <table className="table table-hover">
                   <thead>
                     <tr className="table-secondary">
                       {sheetHeads.map((head, index) => {
                         return (
                           <th scope="col" key={index}>
                             {head}
+                            <span onClick={handleSort} data-head={head}>
+                              排序
+                            </span>
                           </th>
                         );
                       })}
                     </tr>
                     {targetSheetData.map((row, index) => {
+                      console.log(targetSheetData);
                       return (
                         <tr key={index}>
                           {Object.entries(row).map((col, index) => {
+                            console.log(col);
                             const [headName, value] = col;
                             return <td key={index}>{value}</td>;
                           })}

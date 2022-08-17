@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import * as XLSX from "xlsx";
 
 const AppContext = React.createContext();
@@ -8,6 +8,9 @@ const AppProvider = ({ children }) => {
   const [sheetNames, setSheetNames] = useState(null);
   const [sheetData, setSheetData] = useState({});
   const [targetSheetData, setTargetSheetData] = useState(null);
+  const [sortOrder, setSortOrder] = useState(true);
+  const [sortHead, setSortHead] = useState("");
+
   const handleExcel = async (e) => {
     const file = e.target.files[0];
     const data = await file.arrayBuffer();
@@ -28,6 +31,25 @@ const AppProvider = ({ children }) => {
     const tagetSheetName = e.target.textContent;
     setTargetSheetData(sheetData[tagetSheetName]);
   };
+  const handleSort = (e) => {
+    const targetHead = e.target.dataset.head;
+    setSortHead(targetHead);
+    setSortOrder(!sortOrder);
+  };
+  const sortData = (sortHead, sortOrder) => {
+    return targetSheetData.sort((a, b) => {
+      if (sortOrder) {
+        return a[sortHead] - b[sortHead];
+      } else {
+        return b[sortHead] - a[sortHead];
+      }
+    });
+  };
+  useEffect(() => {
+    if (targetSheetData) {
+      setTargetSheetData(sortData(sortHead, sortOrder));
+    }
+  }, [sortOrder, sortHead, targetSheetData, sortData]);
   return (
     <AppContext.Provider
       value={{
@@ -37,6 +59,7 @@ const AppProvider = ({ children }) => {
         targetSheetData,
         changeTargetSheet,
         handleExcel,
+        handleSort,
       }}
     >
       {children}
